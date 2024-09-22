@@ -1,10 +1,21 @@
 require("dotenv").config();
-const path = require("path");
 const express = require("express");
-const staticPath = path.join(__dirname, "../public");
+const http = require("http");
+const path = require("path");
+const socketIO = require("socket.io");
 
 const app = express();
+const server = http.createServer(app);
+const io = socketIO(server);
 
-app.use(express.static(staticPath));
+app.use(express.static(path.join(__dirname, "../public")));
 
-app.listen(process.env.PORT, () => console.log(`server started at ${process.env.PORT}`));
+io.on("connection", (socket) => {
+    console.log("a new connection");
+
+    socket.on("disconnect", () => {
+        console.log("User got discoonected");
+    })
+})
+
+server.listen(process.env.PORT, () => console.log(`server started at ${process.env.PORT}`));
