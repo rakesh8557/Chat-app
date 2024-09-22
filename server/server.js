@@ -11,7 +11,26 @@ const io = socketIO(server);
 app.use(express.static(path.join(__dirname, "../public")));
 
 io.on("connection", (socket) => {
-    console.log("a new connection");
+    socket.emit("newMessage" , {
+        "from" : "Admin",
+        "text" : "Welcome To the Chat"
+    })
+
+    socket.broadcast.emit("newMessage" , {
+        "from" : "Admin",
+        "text" : "A new user joined"
+    })
+
+    socket.on("clientMessage", (message) => {
+        // console.log("clientmessage", message);
+
+        io.emit("newMessage", {
+            from : message.from,
+            text : message.text,
+            createdAt : new Date().getTime()
+        })
+
+    })
 
     socket.on("disconnect", () => {
         console.log("User got discoonected");
